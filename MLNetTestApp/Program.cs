@@ -13,7 +13,7 @@ namespace MLNetTestApp
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine(GetPredictedSum(1f, 4f));
+            Console.WriteLine(GetPredictedSum(500f, 50f));
 
             // var mlContext = new MLContext();
             //
@@ -56,12 +56,13 @@ namespace MLNetTestApp
         {
             var mlContext = new MLContext();
             var pipeline = mlContext.Transforms.CopyColumns("Label", "Label")
-                // .Append(mlContext.Transforms.Categorical.OneHotEncoding("FirstNumberEncoded", "FirstNumber"))
-                // .Append(mlContext.Transforms.Categorical.OneHotEncoding("SecondNumberEncoded", "SecondNumber"))
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("FirstNumberEncoded", "FirstNumber"))
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("SecondNumberEncoded", "SecondNumber"))
                 .Append(mlContext.Transforms.Concatenate("Features",
-                    "FirstNumber",
-                    "SecondNumber"))
-                .Append(mlContext.Regression.Trainers.Sdca());
+                    "FirstNumberEncoded",
+                    "SecondNumberEncoded"))
+                // .Append(mlContext.Transforms.CopyColumns("Score", "Score"))
+                .Append(mlContext.Regression.Trainers.LbfgsPoissonRegression());
                 // .Append(mlContext.Transforms.Conversion.MapKeyToValue("Score"));
             
             var textLoader = mlContext.Data.CreateTextLoader<Sum>(',');
